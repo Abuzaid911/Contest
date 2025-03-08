@@ -1,8 +1,113 @@
 @import "tailwindcss";
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --primary-color: #8B5E3C; /* Warm brown */
+  --secondary-color: #C4A484; /* Desert sand */
+  --accent-color: #B8860B; /* Golden */
+  --background-color: #FDF5E6; /* Old lace */
+  --text-color: #4A4A4A; /* Dark gray */
+}
+
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80"><path d="M40 0l40 40-40 40L0 40z" fill="%23C4A484" fill-opacity="0.05"/></svg>');
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+/* Ramadan-themed card styles */
+.bg-white {
+  background-color: white;
+  border: 1px solid var(--secondary-color);
+  box-shadow: 0 4px 6px rgba(139, 94, 60, 0.1);
+}
+
+/* Ramadan-themed button styles */
+.bg-blue-600 {
+  background-color: var(--primary-color) !important;
+}
+
+.hover\:bg-blue-700:hover {
+  background-color: var(--accent-color) !important;
+}
+
+.text-blue-600 {
+  color: var(--primary-color) !important;
+}
+
+.hover\:text-blue-800:hover {
+  color: var(--accent-color) !important;
+}
+
+/* Winner badge styles */
+.bg-yellow-400 {
+  background-color: var(--accent-color) !important;
+  color: white !important;
+}
+
+/* Heading styles */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--primary-color);
+}
+
+/* Form input styles */
+input, textarea {
+  border-color: var(--secondary-color) !important;
+}
+
+input:focus, textarea:focus {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 2px rgba(139, 94, 60, 0.2) !important;
+}
+
+:root {
+  --primary-brown: #8B4513;
+  --primary-gold: #DAA520;
+  --secondary-gold: #CD853F;
+  --sand-light: #F5DEB3;
+  --mosque-green: #8FBC8F;
+}
+
+body {
+  background-color: var(--sand-light);
+  color: var(--primary-brown);
+}
+
+.btn-primary {
+  background-color: var(--primary-gold);
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: var(--secondary-gold);
+}
+
+.navbar {
+  background-color: var(--primary-brown);
+  color: var(--sand-light);
+}
+
+.card {
+  background-color: white;
+  border: 1px solid var(--mosque-green);
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.winner-banner {
+  background-color: var(--primary-gold);
+  color: var(--primary-brown);
+  border: 2px solid var(--secondary-gold);
 }
 
 @theme inline {
