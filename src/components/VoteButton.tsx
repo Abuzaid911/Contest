@@ -1,4 +1,3 @@
-// components/VoteButton.tsx
 'use client';
 
 import { useState } from 'react';
@@ -44,13 +43,17 @@ export default function VoteButton({
     <button
       onClick={handleVote}
       disabled={isLoading}
-      className={`flex items-center gap-1 px-4 py-2 rounded-full transition-colors ${
+      className={`flex items-center gap-1 px-4 py-2 rounded-full transition-all ${
         voted
-          ? 'bg-red-100 text-red-500'
-          : 'bg-gray-100 text-gray-500 hover:bg-red-50 hover:text-red-500'
-      } disabled:opacity-50`}
+          ? 'bg-primary-gold bg-opacity-20 text-primary-gold'
+          : 'bg-sand-light text-primary-brown hover:bg-primary-gold hover:bg-opacity-20 hover:text-primary-gold'
+      } disabled:opacity-50 border ${voted ? 'border-primary-gold' : 'border-transparent hover:border-primary-gold'}`}
     >
-      <Heart className={voted ? 'fill-current' : ''} size={20} />
+      {isLoading ? (
+        <div className="ramadan-spinner h-5 w-5 border-2 border-primary-gold border-l-transparent"></div>
+      ) : (
+        <Heart className={voted ? 'fill-current' : ''} size={20} />
+      )}
       <span>{votes}</span>
     </button>
   );

@@ -76,7 +76,7 @@ export async function POST(
     });
     
     return NextResponse.json(vote);
-  } catch (_error) {
+  } catch (error) {
     return NextResponse.json({ error: "Failed to vote" }, { status: 500 });
   }
 }
@@ -100,7 +100,7 @@ export async function GET(
     });
     
     return NextResponse.json({ votes });
-  } catch (_error) {
+  } catch (error) {
     return NextResponse.json({ error: "Failed to get votes" }, { status: 500 });
   }
 }

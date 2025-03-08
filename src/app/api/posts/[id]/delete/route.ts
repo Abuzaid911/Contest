@@ -1,3 +1,4 @@
+// app/api/posts/[id]/delete/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import prisma from "@/lib/prisma";

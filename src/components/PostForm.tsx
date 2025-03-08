@@ -1,9 +1,9 @@
-// components/PostForm.tsx
 'use client';
+
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Camera } from 'lucide-react';
+import { Camera, Moon, Star, Upload, AlertCircle } from 'lucide-react';
 
 export default function PostForm() {
   const [title, setTitle] = useState('');
@@ -39,8 +39,7 @@ export default function PostForm() {
     setError('');
 
     try {
-      // Upload image to storage (you'll need to implement this part)
-      // For demo purposes, we'll use a placeholder URL
+      // Upload image
       const imageUrl = await uploadImage(image);
 
       // Create post
@@ -103,82 +102,108 @@ export default function PostForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-2">
-        <label htmlFor="title" className="block text-sm font-medium">
-          Title
-        </label>
-        <input
-          id="title"
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="w-full p-2 border border-primary-gold rounded-md bg-sand-light focus:outline-none focus:ring-2 focus:ring-primary-gold"
-          placeholder="What did you prepare for Iftar today?"
-          required
-        />
+    <div className="bg-cream rounded-lg shadow-md border border-primary-gold p-6">
+      <div className="flex items-center justify-center mb-6">
+        <Moon className="h-6 w-6 text-primary-gold" />
+        <h2 className="text-xl font-semibold mx-2 text-primary-brown font-['Amiri']">Share Your Iftar Meal</h2>
+        <Star className="h-6 w-6 text-primary-gold" />
       </div>
-
-      <div className="space-y-2">
-        <label htmlFor="description" className="block text-sm font-medium">
-          Description (Optional)
-        </label>
-        <textarea
-          id="description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className="w-full p-2 border border-primary-gold rounded-md bg-sand-light focus:outline-none focus:ring-2 focus:ring-primary-gold"
-          placeholder="Share more details about your meal..."
-          rows={3}
-        />
-      </div>
-
-      <div className="space-y-2">
-        <span className="block text-sm font-medium">Photo</span>
-        <div
-          onClick={() => fileInputRef.current?.click()}
-          className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer ${
-            imagePreview ? 'border-gray-300' : 'border-blue-300 hover:border-blue-500'
-          }`}
-        >
-          {imagePreview ? (
-            <div className="relative h-64 w-full">
-              <Image
-                src={imagePreview}
-                alt="Preview"
-                fill
-                className="object-contain"
-              />
-            </div>
-          ) : (
-            <div className="py-8 flex flex-col items-center">
-              <Camera className="h-12 w-12 text-gray-400" />
-              <p className="mt-2 text-sm text-gray-500">
-                Click to upload a photo of your Iftar meal
-              </p>
-            </div>
-          )}
+      
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="space-y-2">
+          <label htmlFor="title" className="block text-sm font-medium text-primary-brown">
+            Meal Title
+          </label>
           <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            className="hidden"
+            id="title"
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="w-full p-2 border border-primary-gold rounded-md bg-sand-light focus:outline-none focus:ring-2 focus:ring-primary-gold"
+            placeholder="What delicious dish did you prepare for Iftar today?"
+            required
           />
         </div>
-      </div>
 
-      {error && (
-        <div className="p-2 text-red-500 bg-red-50 rounded-md">{error}</div>
-      )}
+        <div className="space-y-2">
+          <label htmlFor="description" className="block text-sm font-medium text-primary-brown">
+            Description (Optional)
+          </label>
+          <textarea
+            id="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="w-full p-2 border border-primary-gold rounded-md bg-sand-light focus:outline-none focus:ring-2 focus:ring-primary-gold"
+            placeholder="Share more details about your meal, ingredients, or the tradition behind it..."
+            rows={3}
+          />
+        </div>
 
-      <button
-        type="submit"
-        disabled={isLoading}
-        className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-      >
-        {isLoading ? 'Posting...' : 'Share Your Iftar Meal'}
-      </button>
-    </form>
+        <div className="space-y-2">
+          <span className="block text-sm font-medium text-primary-brown">Meal Photo</span>
+          <div
+            onClick={() => fileInputRef.current?.click()}
+            className={`border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors ${
+              imagePreview 
+                ? 'border-primary-gold' 
+                : 'border-primary-gold border-opacity-50 hover:border-opacity-100'
+            }`}
+          >
+            {imagePreview ? (
+              <div className="relative h-64 w-full">
+                <Image
+                  src={imagePreview}
+                  alt="Preview"
+                  fill
+                  className="object-contain"
+                />
+              </div>
+            ) : (
+              <div className="py-8 flex flex-col items-center">
+                <Camera className="h-12 w-12 text-primary-gold opacity-70" />
+                <p className="mt-2 text-sm text-primary-brown">
+                  Click to upload a photo of your Iftar meal
+                </p>
+                <p className="text-xs text-primary-brown opacity-70 mt-1">
+                  Share your delicious creation with the community
+                </p>
+              </div>
+            )}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="hidden"
+            />
+          </div>
+        </div>
+
+        {error && (
+          <div className="p-3 text-red-600 bg-red-50 rounded-md border border-red-200 flex items-start">
+            <AlertCircle className="h-5 w-5 mr-2 flex-shrink-0 mt-0.5" />
+            <span>{error}</span>
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={isLoading}
+          className="w-full py-3 px-4 bg-primary-gold text-white rounded-md hover:bg-secondary-gold disabled:opacity-50 transition-colors flex items-center justify-center"
+        >
+          {isLoading ? (
+            <>
+              <div className="ramadan-spinner mr-2 border-2 h-5 w-5 border-white border-l-transparent"></div>
+              Sharing...
+            </>
+          ) : (
+            <>
+              <Upload className="h-5 w-5 mr-2" />
+              Share Your Iftar Meal
+            </>
+          )}
+        </button>
+      </form>
+    </div>
   );
 }

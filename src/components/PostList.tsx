@@ -1,4 +1,3 @@
-// components/PostList.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -16,6 +15,7 @@ interface Post {
     id: string;
     name: string | null;
     image: string | null;
+    email?: string;
   };
   _count: {
     votes: number;
@@ -73,6 +73,19 @@ export default function PostList() {
       .then((response) => response.json())
       .then((data) => setPosts(data))
       .catch((err) => console.error('Failed to refresh posts:', err));
+    
+    // Refetch user votes
+    if (session) {
+      fetch('/api/user/votes')
+        .then((response) => response.json())
+        .then((data) => setUserVotes(new Set(data.map((vote: { postId: string }) => vote.postId))))
+        .catch((err) => console.error('Failed to refresh user votes:', err));
+    }
+  };
+
+  const handleDelete = (postId: string) => {
+    // Remove the post from the local state
+    setPosts(posts.filter(post => post.id !== postId));
   };
 
   if (loading) {
@@ -100,6 +113,7 @@ export default function PostList() {
           post={post}
           hasVoted={userVotes.has(post.id)}
           onVote={handleVote}
+          onDelete={() => handleDelete(post.id)}
         />
       ))}
     </div>

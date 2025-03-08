@@ -1,8 +1,10 @@
-// components/PostCard.tsx
+'use client';
+
 import { useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-import { Heart } from 'lucide-react';
+import { Heart, Trash2, Award } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 interface PostCardProps {
@@ -17,6 +19,7 @@ interface PostCardProps {
       id: string;
       name: string | null;
       image: string | null;
+      email?: string;
     };
     _count: {
       votes: number;
@@ -83,7 +86,22 @@ export default function PostCard({ post, hasVoted, onVote, onDelete }: PostCardP
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden">
+    <div className="bg-cream rounded-lg shadow-md overflow-hidden border border-primary-gold post-card">
+      {/* Owner indicator and delete option */}
+      {isOwnPost && (
+        <div className="bg-primary-brown bg-opacity-10 py-1 px-3 flex justify-between items-center">
+          <span className="text-xs text-primary-brown">Your Post</span>
+          <button
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className="text-red-500 hover:text-red-700 disabled:opacity-50 flex items-center text-sm"
+          >
+            <Trash2 size={16} className="mr-1" />
+            {isDeleting ? 'Deleting...' : 'Delete'}
+          </button>
+        </div>
+      )}
+      
       <div className="relative h-64 w-full">
         <Image
           src={post.imageUrl}
@@ -92,14 +110,15 @@ export default function PostCard({ post, hasVoted, onVote, onDelete }: PostCardP
           className="object-cover"
         />
         {post.isWinner && (
-          <div className="absolute top-2 right-2 bg-yellow-400 text-black font-bold py-1 px-3 rounded-full">
+          <div className="absolute top-2 right-2 bg-primary-gold text-white font-bold py-1 px-3 rounded-full flex items-center shadow-md border-2 border-white">
+            <Award className="h-5 w-5 mr-1" />
             Winner!
           </div>
         )}
       </div>
       <div className="p-4">
         <div className="flex items-center mb-2">
-          <div className="h-10 w-10 rounded-full overflow-hidden relative mr-2">
+          <div className="h-10 w-10 rounded-full overflow-hidden relative mr-2 border-2 border-primary-gold">
             <Image
               src={post.author.image || '/placeholder-avatar.png'}
               alt={post.author.name || 'User'}
@@ -108,35 +127,39 @@ export default function PostCard({ post, hasVoted, onVote, onDelete }: PostCardP
             />
           </div>
           <div>
-            <p className="font-medium">{post.author.name || 'Anonymous'}</p>
+            <p className="font-medium text-primary-brown">{post.author.name || 'Anonymous'}</p>
             <p className="text-sm text-gray-500">
               {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
             </p>
           </div>
         </div>
-        <h3 className="text-xl font-semibold mb-2">{post.title}</h3>
-        {post.description && (
-          <p className="text-gray-700 mb-4">{post.description}</p>
-        )}
-        <div className="flex items-center justify-between">
-          {session && isOwnPost ? (
-            <button
-              onClick={handleDelete}
-              disabled={isDeleting}
-              className="text-red-500 hover:text-red-700 disabled:opacity-50"
-            >
-              {isDeleting ? 'Deleting...' : 'Delete Post'}
-            </button>
-          ) : (
-            <button
-              onClick={handleVote}
-              disabled={!session || isVoting || isOwnPost}
-              className={`flex items-center gap-1 p-2 rounded-full ${voted ? 'text-red-500' : 'text-gray-500 hover:text-red-500'} transition-colors disabled:opacity-50`}
-            >
-              <Heart className={voted ? 'fill-current' : ''} size={20} />
-              <span>{votes}</span>
-            </button>
+        <Link href={`/posts/${post.id}`} className="block hover:opacity-80 transition-opacity">
+          <h3 className="text-xl font-semibold mb-2 text-primary-brown font-['Amiri']">{post.title}</h3>
+          {post.description && (
+            <p className="text-primary-brown opacity-80 mb-4 line-clamp-2">{post.description}</p>
           )}
+        </Link>
+        <div className="flex items-center justify-between mt-4 pt-3 border-t border-primary-gold border-opacity-20">
+          <button
+            onClick={handleVote}
+            disabled={!session || isVoting || isOwnPost}
+            className={`flex items-center gap-1 p-2 px-3 rounded-full ${
+              voted 
+                ? 'bg-primary-gold bg-opacity-20 text-primary-gold' 
+                : 'bg-sand-light text-primary-brown hover:bg-primary-gold hover:bg-opacity-20 hover:text-primary-gold'
+            } disabled:opacity-50 ${isOwnPost ? 'cursor-not-allowed' : ''}`}
+            title={isOwnPost ? "You cannot vote on your own post" : ""}
+          >
+            <Heart className={voted ? 'fill-current' : ''} size={20} />
+            <span>{votes}</span>
+          </button>
+          
+          <Link 
+            href={`/posts/${post.id}`}
+            className="text-primary-gold hover:text-secondary-gold transition-colors text-sm font-medium"
+          >
+            View Details
+          </Link>
         </div>
       </div>
     </div>
