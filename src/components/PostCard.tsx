@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-import { Heart, Trash2, Award } from 'lucide-react';
+import { Heart, Trash2, Award, Share2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 interface PostCardProps {
@@ -184,17 +184,52 @@ export default function PostCard({ post, hasVoted, onVote, onDelete }: PostCardP
         </Link>
         
         <div className="flex items-center justify-between mt-4 pt-3 border-t border-primary-gold border-opacity-20">
-          <button
-            onClick={handleVote}
-            disabled={!session || isVoting || isOwner}
-            className={`flex items-center gap-1 p-2 px-3 rounded-full transition-all duration-200 ${voted ? 'vote-button-active bg-opacity-20 text-primary-gold' : 'bg-sand-light text-primary-brown hover:bg-primary-gold hover:bg-opacity-20 hover:text-primary-gold'} disabled:opacity-50 ${isOwner ? 'cursor-not-allowed' : ''} focus:outline-none focus:ring-2 focus:ring-primary-gold focus:ring-offset-2`}
-            title={isOwner ? "You cannot vote on your own post" : (!session ? "Sign in to vote" : "Vote for this meal")}
-            aria-label={`Vote for ${post.title}${voted ? ' (voted)' : ''}`}
-            aria-pressed={voted}
-          >
-            <Heart className={`transition-transform duration-200 ${voted ? 'fill-current scale-110' : 'scale-100'}`} size={20} />
-            <span className="font-medium">{votes}</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleVote}
+              disabled={!session || isVoting || isOwner}
+              className={`flex items-center gap-1 p-2 px-3 rounded-full transition-all duration-200 ${voted ? 'vote-button-active bg-opacity-20 text-primary-gold' : 'bg-sand-light text-primary-brown hover:bg-primary-gold hover:bg-opacity-20 hover:text-primary-gold'} disabled:opacity-50 ${isOwner ? 'cursor-not-allowed' : ''} focus:outline-none focus:ring-2 focus:ring-primary-gold focus:ring-offset-2`}
+              title={isOwner ? "You cannot vote on your own post" : (!session ? "Sign in to vote" : "Vote for this meal")}
+              aria-label={`Vote for ${post.title}${voted ? ' (voted)' : ''}`}
+              aria-pressed={voted}
+            >
+              <Heart className={`transition-transform duration-200 ${voted ? 'fill-current scale-110' : 'scale-100'}`} size={20} />
+              <span className="font-medium">{votes}</span>
+            </button>
+            
+            <button
+              onClick={async () => {
+                const shareUrl = `${window.location.origin}/posts/${post.id}`;
+                const shareText = `Check out this amazing Iftar meal: ${post.title}`;
+                
+                if (navigator.share) {
+                  try {
+                    await navigator.share({
+                      title: post.title,
+                      text: shareText,
+                      url: shareUrl
+                    });
+                  } catch (err) {
+                    if (err.name !== 'AbortError') {
+                      console.error('Error sharing:', err);
+                    }
+                  }
+                } else {
+                  try {
+                    await navigator.clipboard.writeText(`${shareText}\n${shareUrl}`);
+                    alert('Link copied to clipboard!');
+                  } catch (err) {
+                    console.error('Error copying to clipboard:', err);
+                  }
+                }
+              }}
+              className="p-2 px-3 rounded-full bg-sand-light text-primary-brown hover:bg-primary-gold hover:bg-opacity-20 hover:text-primary-gold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-gold focus:ring-offset-2"
+              title="Share this meal"
+              aria-label={`Share ${post.title}`}
+            >
+              <Share2 size={20} />
+            </button>
+          </div>
           
           <Link 
             href={`/posts/${post.id}`}
