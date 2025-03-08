@@ -187,7 +187,7 @@ export default function PostCard({ post, hasVoted, onVote, onDelete }: PostCardP
           <button
             onClick={handleVote}
             disabled={!session || isVoting || isOwner}
-            className={`flex items-center gap-1 p-2 px-3 rounded-full transition-all duration-200 ${voted ? 'vote-button-active bg-primary-gold bg-opacity-20 text-primary-gold' : 'bg-sand-light text-primary-brown hover:bg-primary-gold hover:bg-opacity-20 hover:text-primary-gold'} disabled:opacity-50 ${isOwner ? 'cursor-not-allowed' : ''} focus:outline-none focus:ring-2 focus:ring-primary-gold focus:ring-offset-2`}
+            className={`flex items-center gap-1 p-2 px-3 rounded-full transition-all duration-200 ${voted ? 'vote-button-active bg-opacity-20 text-primary-gold' : 'bg-sand-light text-primary-brown hover:bg-primary-gold hover:bg-opacity-20 hover:text-primary-gold'} disabled:opacity-50 ${isOwner ? 'cursor-not-allowed' : ''} focus:outline-none focus:ring-2 focus:ring-primary-gold focus:ring-offset-2`}
             title={isOwner ? "You cannot vote on your own post" : (!session ? "Sign in to vote" : "Vote for this meal")}
             aria-label={`Vote for ${post.title}${voted ? ' (voted)' : ''}`}
             aria-pressed={voted}
