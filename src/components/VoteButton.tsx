@@ -52,7 +52,7 @@ export default function VoteButton({
       {isLoading ? (
         <div className="ramadan-spinner h-5 w-5 border-2 border-primary-gold border-l-transparent"></div>
       ) : (
-        <Heart className={voted ? 'fill-current' : ''} size={20} />
+        <Heart className={voted ? '' : ''} size={20} />
       )}
       <span>{votes}</span>
     </button>
