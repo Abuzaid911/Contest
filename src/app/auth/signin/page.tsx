@@ -3,7 +3,7 @@
 import { signIn } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
-import { Moon, Star, LogIn } from 'lucide-react';
+import { Moon, Star } from 'lucide-react';
 import Image from 'next/image';
 
 function SignInContent() {
@@ -53,14 +53,6 @@ function SignInContent() {
                 className="mr-2 bg-white rounded-full p-1"
               />
               Sign in with Google
-            </button>
-
-            <button
-              onClick={() => signIn('credentials', { callbackUrl })}
-              className="w-full flex justify-center items-center py-3 px-4 border border-primary-gold rounded-md shadow-md text-base font-medium text-primary-brown bg-cream hover:bg-sand-light transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-gold"
-            >
-              <LogIn className="mr-2 h-5 w-5 text-primary-gold" />
-              Continue as Guest
             </button>
           </div>
         </div>
