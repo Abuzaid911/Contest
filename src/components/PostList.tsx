@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import PostCard from './PostCard';
 import { Moon } from 'lucide-react';
+import CountdownTimer from './CountdownTimer';
 
 interface Post {
   id: string;
@@ -123,8 +124,12 @@ export default function PostList() {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {posts.map((post) => (
+    <div>
+      <div className="mb-8">
+        <CountdownTimer />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {posts.map((post) => (
         <PostCard
           key={post.id}
           post={post}
@@ -133,6 +138,7 @@ export default function PostList() {
           onDelete={() => handleDelete(post.id)}
         />
       ))}
+    </div>
     </div>
   );
 }
