@@ -1,12 +1,20 @@
 // app/layout.tsx
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Amiri } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import AuthProvider from '@/components/AuthProvider';
 import { Moon, Star } from 'lucide-react';
 
 const inter = Inter({ subsets: ['latin'] });
+const amiri = Amiri({ 
+  weight: ['400', '700'],
+  subsets: ['arabic', 'latin'],
+  display: 'swap',
+  variable: '--font-amiri',
+  preload: true,
+  adjustFontFallback: true
+});
 
 export const metadata: Metadata = {
   title: 'Ramadan Iftar Contest',
@@ -22,7 +30,7 @@ export default function RootLayout({
   
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${inter.className} ${amiri.variable}`}>
         <AuthProvider>
           <Navbar />
           <main className="min-h-screen">{children}</main>
