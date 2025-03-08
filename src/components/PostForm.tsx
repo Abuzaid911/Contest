@@ -120,7 +120,7 @@ export default function PostForm() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="w-full p-2 border border-primary-gold rounded-md bg-sand-light focus:outline-none focus:ring-2 focus:ring-primary-gold"
-            placeholder="What delicious dish did you prepare for Iftar today?"
+            placeholder="What delicious dish did you prepare today?"
             required
           />
         </div>
