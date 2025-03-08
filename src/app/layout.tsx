@@ -36,11 +36,6 @@ export default function RootLayout({
               </div>
               <p className="opacity-90">© {currentYear} Ramadan Iftar Contest</p>
               <p className="mt-2 text-sm opacity-70">Share your Iftar meals and celebrate Ramadan together</p>
-              <div className="mt-4 flex justify-center space-x-4 text-xs opacity-70">
-                <a href="#" className="hover:text-primary-gold transition-colors">Privacy Policy</a>
-                <a href="#" className="hover:text-primary-gold transition-colors">Terms of Service</a>
-                <a href="#" className="hover:text-primary-gold transition-colors">Contact Us</a>
-              </div>
             </div>
             <div className="absolute bottom-0 left-0 right-0 h-2 bg-primary-gold opacity-50"></div>
           </footer>
