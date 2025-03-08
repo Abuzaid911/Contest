@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
@@ -15,11 +15,12 @@ interface PostCardProps {
     imageUrl: string;
     createdAt: string;
     isWinner: boolean;
+    authorId: string;
     author: {
       id: string;
       name: string | null;
       image: string | null;
-      email?: string;
+      email: string;
     };
     _count: {
       votes: number;
@@ -31,16 +32,48 @@ interface PostCardProps {
 }
 
 export default function PostCard({ post, hasVoted, onVote, onDelete }: PostCardProps) {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [isVoting, setIsVoting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [votes, setVotes] = useState(post._count.votes);
   const [voted, setVoted] = useState(hasVoted);
-
-  const isOwnPost = session?.user?.email === post.author.email;
-
+  const [isOwner, setIsOwner] = useState(false);
+  
+  // Check if the current user is the post owner
+  useEffect(() => {
+    if (status === 'authenticated' && session?.user) {
+      console.log('Session user:', session.user);
+      console.log('Post author:', post.author);
+      console.log('Post authorId:', post.authorId);
+      
+      // Try to determine if the logged-in user is the post author
+      let currentUserIsOwner = false;
+      
+      // Check by email (most reliable)
+      if (session.user.email && session.user.email === post.author.email) {
+        currentUserIsOwner = true;
+      }
+      
+      // Check by IDs if available
+      if (session.user.id && session.user.id === post.authorId) {
+        currentUserIsOwner = true;
+      }
+      
+      // Special case for NextAuth with OAuth providers
+      // @ts-ignore - for sub which might not be in the type
+      if (session.user.sub && session.user.sub === post.authorId) {
+        currentUserIsOwner = true;
+      }
+      
+      console.log('Is owner detected?', currentUserIsOwner);
+      setIsOwner(currentUserIsOwner);
+    } else {
+      setIsOwner(false);
+    }
+  }, [status, session, post]);
+  
   const handleVote = async () => {
-    if (!session || isOwnPost) return;
+    if (!session || isOwner) return;
     if (isVoting) return;
 
     setIsVoting(true);
@@ -62,7 +95,7 @@ export default function PostCard({ post, hasVoted, onVote, onDelete }: PostCardP
   };
 
   const handleDelete = async () => {
-    if (!session || !isOwnPost || isDeleting) return;
+    if (!session || !isOwner || isDeleting) return;
 
     if (!confirm('Are you sure you want to delete this post?')) return;
 
@@ -73,7 +106,7 @@ export default function PostCard({ post, hasVoted, onVote, onDelete }: PostCardP
       });
 
       if (response.ok) {
-        onDelete?.();
+        if (onDelete) onDelete();
       } else {
         throw new Error('Failed to delete post');
       }
@@ -87,21 +120,6 @@ export default function PostCard({ post, hasVoted, onVote, onDelete }: PostCardP
 
   return (
     <div className="bg-cream rounded-lg shadow-md overflow-hidden border border-primary-gold post-card">
-      {/* Owner indicator and delete option */}
-      {isOwnPost && (
-        <div className="bg-primary-brown bg-opacity-10 py-1 px-3 flex justify-between items-center">
-          <span className="text-xs text-primary-brown">Your Post</span>
-          <button
-            onClick={handleDelete}
-            disabled={isDeleting}
-            className="text-red-500 hover:text-red-700 disabled:opacity-50 flex items-center text-sm"
-          >
-            <Trash2 size={16} className="mr-1" />
-            {isDeleting ? 'Deleting...' : 'Delete'}
-          </button>
-        </div>
-      )}
-      
       <div className="relative h-64 w-full">
         <Image
           src={post.imageUrl}
@@ -115,8 +133,30 @@ export default function PostCard({ post, hasVoted, onVote, onDelete }: PostCardP
             Winner!
           </div>
         )}
+        
+        {/* Delete button overlay - visible only for post owner */}
+        {isOwner && (
+          <div className="absolute top-2 left-2 z-10">
+            <button
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-md transition-colors flex items-center justify-center"
+              title="Delete this post"
+            >
+              <Trash2 size={20} />
+            </button>
+          </div>
+        )}
       </div>
+      
       <div className="p-4">
+        {/* Owner indicator - "Your Post" banner */}
+        {isOwner && (
+          <div className="mb-2 -mt-1 bg-primary-brown bg-opacity-10 py-1 px-2 rounded text-xs text-primary-brown font-medium inline-block">
+            Your Post
+          </div>
+        )}
+        
         <div className="flex items-center mb-2">
           <div className="h-10 w-10 rounded-full overflow-hidden relative mr-2 border-2 border-primary-gold">
             <Image
@@ -133,22 +173,24 @@ export default function PostCard({ post, hasVoted, onVote, onDelete }: PostCardP
             </p>
           </div>
         </div>
+        
         <Link href={`/posts/${post.id}`} className="block hover:opacity-80 transition-opacity">
           <h3 className="text-xl font-semibold mb-2 text-primary-brown font-['Amiri']">{post.title}</h3>
           {post.description && (
             <p className="text-primary-brown opacity-80 mb-4 line-clamp-2">{post.description}</p>
           )}
         </Link>
+        
         <div className="flex items-center justify-between mt-4 pt-3 border-t border-primary-gold border-opacity-20">
           <button
             onClick={handleVote}
-            disabled={!session || isVoting || isOwnPost}
+            disabled={!session || isVoting || isOwner}
             className={`flex items-center gap-1 p-2 px-3 rounded-full ${
               voted 
                 ? 'bg-primary-gold bg-opacity-20 text-primary-gold' 
                 : 'bg-sand-light text-primary-brown hover:bg-primary-gold hover:bg-opacity-20 hover:text-primary-gold'
-            } disabled:opacity-50 ${isOwnPost ? 'cursor-not-allowed' : ''}`}
-            title={isOwnPost ? "You cannot vote on your own post" : ""}
+            } disabled:opacity-50 ${isOwner ? 'cursor-not-allowed' : ''}`}
+            title={isOwner ? "You cannot vote on your own post" : (!session ? "Sign in to vote" : "Vote for this meal")}
           >
             <Heart className={voted ? 'fill-current' : ''} size={20} />
             <span>{votes}</span>

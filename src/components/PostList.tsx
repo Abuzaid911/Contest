@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import PostCard from './PostCard';
+import { Moon } from 'lucide-react';
 
 interface Post {
   id: string;
@@ -11,11 +12,12 @@ interface Post {
   imageUrl: string;
   createdAt: string;
   isWinner: boolean;
+  authorId: string;
   author: {
     id: string;
     name: string | null;
     image: string | null;
-    email?: string;
+    email: string;
   };
   _count: {
     votes: number;
@@ -29,78 +31,93 @@ export default function PostList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        const response = await fetch('/api/posts');
-        if (!response.ok) {
-          throw new Error('Failed to fetch posts');
-        }
-        const data = await response.json();
-        setPosts(data);
-      } catch (err) {
-        setError('Failed to load posts. Please try again later.');
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const fetchUserVotes = async () => {
-      if (!session?.user) return;
+  const fetchPosts = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch('/api/posts');
       
-      try {
-        const response = await fetch('/api/user/votes');
-        if (!response.ok) {
-          throw new Error('Failed to fetch user votes');
-        }
-        const data = await response.json();
-        setUserVotes(new Set(data.map((vote: { postId: string }) => vote.postId)));
-      } catch (err) {
-        console.error('Failed to fetch user votes:', err);
+      if (!response.ok) {
+        throw new Error('Failed to fetch posts');
       }
-    };
+      
+      const data = await response.json();
+      console.log('Fetched posts:', data);
+      setPosts(data);
+      setError('');
+    } catch (err) {
+      console.error('Error fetching posts:', err);
+      setError('Failed to load posts. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  const fetchUserVotes = async () => {
+    if (!session?.user) return;
+    
+    try {
+      const response = await fetch('/api/user/votes');
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch user votes');
+      }
+      
+      const data = await response.json();
+      setUserVotes(new Set(data.map((vote: { postId: string }) => vote.postId)));
+    } catch (err) {
+      console.error('Failed to fetch user votes:', err);
+    }
+  };
+
+  useEffect(() => {
     fetchPosts();
+  }, []);
+
+  useEffect(() => {
     if (session) {
       fetchUserVotes();
     }
   }, [session]);
 
   const handleVote = () => {
-    // Refetch posts to update vote counts
-    fetch('/api/posts')
-      .then((response) => response.json())
-      .then((data) => setPosts(data))
-      .catch((err) => console.error('Failed to refresh posts:', err));
-    
-    // Refetch user votes
-    if (session) {
-      fetch('/api/user/votes')
-        .then((response) => response.json())
-        .then((data) => setUserVotes(new Set(data.map((vote: { postId: string }) => vote.postId))))
-        .catch((err) => console.error('Failed to refresh user votes:', err));
-    }
+    // Refetch both posts and votes to ensure everything is up-to-date
+    fetchPosts();
+    fetchUserVotes();
   };
 
   const handleDelete = (postId: string) => {
-    // Remove the post from the local state
-    setPosts(posts.filter(post => post.id !== postId));
+    setPosts(currentPosts => currentPosts.filter(post => post.id !== postId));
   };
 
   if (loading) {
-    return <div className="text-center py-8">Loading posts...</div>;
+    return (
+      <div className="flex justify-center items-center py-16">
+        <div className="ramadan-spinner mr-3"></div>
+        <span className="text-primary-brown">Loading meals...</span>
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="text-center text-red-500 py-8">{error}</div>;
+    return (
+      <div className="text-center text-red-500 py-8 bg-red-50 rounded-lg border border-red-200">
+        <p>{error}</p>
+        <button 
+          onClick={fetchPosts}
+          className="mt-4 px-4 py-2 bg-primary-gold text-white rounded-md hover:bg-secondary-gold transition-colors"
+        >
+          Try Again
+        </button>
+      </div>
+    );
   }
 
   if (posts.length === 0) {
     return (
-      <div className="text-center py-8 bg-gray-50 rounded-lg">
-        <p className="text-gray-600">No Iftar meals shared yet today.</p>
-        <p className="text-gray-500 mt-2">Be the first to share your meal!</p>
+      <div className="text-center py-16 bg-sand-light rounded-lg border border-primary-gold border-opacity-50">
+        <Moon className="h-12 w-12 text-primary-gold mx-auto mb-4 opacity-50" />
+        <p className="text-primary-brown text-lg font-['Amiri']">No Iftar meals shared yet today.</p>
+        <p className="text-primary-brown opacity-70 mt-2">Be the first to share your meal!</p>
       </div>
     );
   }

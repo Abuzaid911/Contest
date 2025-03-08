@@ -35,6 +35,7 @@ export async function GET(req: NextRequest) {
             id: true,
             name: true,
             image: true,
+            email: true, // Include email for ownership checks
           },
         },
         _count: {
@@ -49,7 +50,8 @@ export async function GET(req: NextRequest) {
     });
     
     return NextResponse.json(posts);
-  } catch (_error) {
+  } catch (error) {
+    console.error("Error fetching posts:", error);
     return NextResponse.json({ error: "Failed to fetch posts" }, { status: 500 });
   }
 }
@@ -110,7 +112,8 @@ export async function POST(req: NextRequest) {
     });
     
     return NextResponse.json(post);
-  } catch (_error) {
+  } catch (error) {
+    console.error("Error creating post:", error);
     return NextResponse.json({ error: "Failed to create post" }, { status: 500 });
   }
 }
