@@ -52,25 +52,41 @@ async function determineWinner() {
     
     console.log(`Found ${posts.length} posts from yesterday.`);
     
-    // Get the post with the most votes
-    const winner = posts[0];
+    // Reset previous winners
+    await prisma.post.updateMany({
+      where: {
+        isWinner: true
+      },
+      data: {
+        isWinner: false
+      }
+    });
+
+    // Get all posts with the highest vote count
+    const maxVotes = posts[0]._count.votes;
+    const winners = posts.filter(post => post._count.votes === maxVotes);
     
-    if (winner._count.votes === 0) {
+    if (maxVotes === 0) {
       console.log('No votes found for any posts yesterday.');
       return;
     }
     
-    console.log(`Winner: ${winner.title} by ${winner.author.name || 'Anonymous'} with ${winner._count.votes} votes.`);
-    
-    // Update the post to mark it as a winner
-    await prisma.post.update({
-      where: {
-        id: winner.id,
-      },
-      data: {
-        isWinner: true,
-      },
+    // Log all winners
+    winners.forEach(winner => {
+      console.log(`Winner: ${winner.title} by ${winner.author.name || 'Anonymous'} with ${winner._count.votes} votes.`);
     });
+    
+    // Update all winning posts
+    await Promise.all(winners.map(winner =>
+      prisma.post.update({
+        where: {
+          id: winner.id,
+        },
+        data: {
+          isWinner: true,
+        },
+      })
+    ));
     
     console.log(`Updated post ${winner.id} as the daily winner.`);
     
