@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import PostCard from './PostCard';
-import { Moon } from 'lucide-react';
+import { Moon, Calendar } from 'lucide-react';
 import CountdownTimer from './CountdownTimer';
+import { format } from 'date-fns';
 
 interface Post {
   id: string;
@@ -31,11 +32,12 @@ export default function PostList() {
   const [userVotes, setUserVotes] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [selectedDate, setSelectedDate] = useState<string>(format(new Date(), 'yyyy-MM-dd'));
 
   const fetchPosts = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/posts');
+      const response = await fetch(`/api/posts?date=${selectedDate}`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch posts');
@@ -72,7 +74,7 @@ export default function PostList() {
 
   useEffect(() => {
     fetchPosts();
-  }, []);
+  }, [selectedDate]);
 
   useEffect(() => {
     if (session) {
@@ -88,6 +90,10 @@ export default function PostList() {
 
   const handleDelete = (postId: string) => {
     setPosts(currentPosts => currentPosts.filter(post => post.id !== postId));
+  };
+
+  const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedDate(event.target.value);
   };
 
   if (loading) {
@@ -113,32 +119,47 @@ export default function PostList() {
     );
   }
 
-  if (posts.length === 0) {
-    return (
-      <div className="text-center py-16 bg-sand-light rounded-lg border border-primary-gold border-opacity-50">
-        <Moon className="h-12 w-12 text-primary-gold mx-auto mb-4 opacity-50" />
-        <p className="text-primary-brown text-lg font-['Amiri']">No Iftar meals shared yet today.</p>
-        <p className="text-primary-brown opacity-70 mt-2">Be the first to share your meal!</p>
-      </div>
-    );
-  }
-
   return (
     <div>
       <div className="mb-8">
         <CountdownTimer />
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {posts.map((post) => (
-        <PostCard
-          key={post.id}
-          post={post}
-          hasVoted={userVotes.has(post.id)}
-          onVote={handleVote}
-          onDelete={() => handleDelete(post.id)}
+      
+      <div className="mb-6 flex items-center justify-between bg-sand-light p-4 rounded-lg border border-primary-gold border-opacity-30">
+        <div className="flex items-center gap-2">
+          <Calendar className="text-primary-gold" size={20} />
+          <span className="text-primary-brown font-medium">Select Date:</span>
+        </div>
+        <input
+          type="date"
+          value={selectedDate}
+          onChange={handleDateChange}
+          className="px-3 py-2 rounded-md border border-primary-gold border-opacity-30 bg-white focus:outline-none focus:ring-2 focus:ring-primary-gold focus:border-primary-gold text-primary-brown"
+          max={format(new Date(), 'yyyy-MM-dd')}
         />
-      ))}
-    </div>
+      </div>
+
+      {posts.length === 0 ? (
+        <div className="text-center py-16 bg-sand-light rounded-lg border border-primary-gold border-opacity-50">
+          <Moon className="h-12 w-12 text-primary-gold mx-auto mb-4 opacity-50" />
+          <p className="text-primary-brown text-lg font-['Amiri']">No Iftar meals found for {format(new Date(selectedDate), 'MMMM d, yyyy')}.</p>
+          {selectedDate === format(new Date(), 'yyyy-MM-dd') && (
+            <p className="text-primary-brown opacity-70 mt-2">Be the first to share your meal!</p>
+          )}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {posts.map((post) => (
+            <PostCard
+              key={post.id}
+              post={post}
+              hasVoted={userVotes.has(post.id)}
+              onVote={handleVote}
+              onDelete={() => handleDelete(post.id)}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
