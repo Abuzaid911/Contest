@@ -6,8 +6,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import prisma from '@/lib/prisma';
 import PostList from '@/components/PostList';
-import WinnerBanner from '@/components/WinnerBanner';
-import { Moon, Camera, Star } from 'lucide-react';
+import { Moon, Camera, Star, Trophy } from 'lucide-react';
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
@@ -15,10 +14,6 @@ export default async function Home() {
   // Get today's date (midnight)
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-
-  // Get yesterday's date (midnight)
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
 
   // Check if the user has already posted today
   let hasPostedToday = false;
@@ -47,91 +42,70 @@ export default async function Home() {
     }
   }
 
-  // Fetch yesterday's winner
-  const winner = await prisma.post.findFirst({
-    where: {
-      date: {
-        gte: yesterday,
-        lt: today,
-      },
-      isWinner: true,
-    },
-    include: {
-      author: {
-        select: {
-          id: true,
-          name: true,
-          image: true,
-        },
-      },
-      _count: {
-        select: {
-          votes: true,
-        },
-      },
-    },
-  });
-
   return (
-    <main className="container mx-auto px-4 py-8">
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center">
-          <div className="h-12 w-12 flex items-center justify-center">
-            <Moon className="h-8 w-8 text-primary-gold" />
-          </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-primary-brown mx-2 font-['Amiri']">
+    <main className="container mx-auto px-4 py-10 md:py-12">
+      {/* Header section */}
+      <div className="text-center mb-10 md:mb-12">
+        <div className="inline-flex items-center justify-center mb-4">
+          <Moon className="h-9 w-9 md:h-10 md:w-10 text-primary-gold" />
+          <h1 className="text-4xl md:text-5xl font-bold text-primary-brown mx-4 font-['Amiri'] tracking-wide">
             رمضان كريم
           </h1>
-          <div className="h-12 w-12 flex items-center justify-center">
-            <Star className="h-8 w-8 text-primary-gold" />
-          </div>
+          <Star className="h-9 w-9 md:h-10 md:w-10 text-primary-gold" />
         </div>
-        <p className="mt-2 text-primary-brown opacity-80 max-w-2xl mx-auto font-['Amiri'] text-2xl">
-          Share your delicious Iftar meals with the community and vote for your favorites.
-          Every day, one meal will be crowned as the winner! <br/>
-           شاركونا فطوركم كل يوم
+        <p className="mt-4 text-primary-brown opacity-85 max-w-2xl mx-auto text-lg leading-relaxed font-['Amiri']">
+          Join our Ramadan community by sharing your beautiful Iftar meals and discovering dishes from others.
+          Vote for your favorites and celebrate the blessed month together with delicious food!
         </p>
       </div>
 
-      {winner && <WinnerBanner winner={winner} />}
-
-      <div className="flex justify-center mb-8">
+      {/* Action buttons */}
+      <div className="flex flex-col sm:flex-row justify-center items-center gap-5 mb-12">
         {session ? (
           hasPostedToday ? (
-            <div className="bg-sand-light text-primary-brown p-4 rounded-md border border-primary-gold flex items-center">
-              <Moon className="h-5 w-5 text-primary-gold mr-2" />
-              <span>You've already shared your Iftar meal today!</span>
+            <div className="bg-sand-light text-primary-brown px-6 py-4 rounded-md border border-primary-gold flex items-center shadow-sm">
+              <Moon className="h-5 w-5 text-primary-gold mr-3" />
+              <span className="font-medium">You've already shared your Iftar meal today!</span>
             </div>
           ) : (
             <Link
               href="/post"
-              className="bg-primary-gold hover:bg-secondary-gold text-white px-6 py-3 rounded-md font-medium transition-colors shadow-md flex items-center"
+              className="bg-primary-gold hover:bg-secondary-gold text-white px-8 py-4 rounded-md font-medium transition-colors shadow-md flex items-center text-lg"
             >
-              <Camera className="h-5 w-5 mr-2" />
+              <Camera className="h-5 w-5 mr-3" />
               Share Your Iftar Meal
             </Link>
           )
         ) : (
           <Link
             href="/api/auth/signin"
-            className="bg-primary-gold hover:bg-secondary-gold text-white px-6 py-3 rounded-md font-medium transition-colors shadow-md"
+            className="bg-primary-gold hover:bg-secondary-gold text-white px-8 py-4 rounded-md font-medium transition-colors shadow-md text-lg"
           >
             Sign In to Participate
           </Link>
         )}
+        
+        <Link
+          href="/winners"
+          className="flex items-center text-primary-brown hover:text-primary-gold transition-colors px-7 py-3.5 rounded-md bg-cream hover:bg-sand-light border border-primary-gold border-opacity-30 shadow-sm font-medium"
+        >
+          <Trophy className="h-5 w-5 mr-2 text-primary-gold" />
+          View Past Winners
+        </Link>
       </div>
 
-      <div className="relative mb-6">
-        <div className="absolute left-0 right-0 h-px bg-primary-gold opacity-30"></div>
-        <h2 className="relative inline-block bg-sand-lighter px-4 text-2xl font-semibold text-primary-brown font-['Amiri']">
+      {/* Today's meals section */}
+      <div className="relative mb-8">
+        <div className="absolute left-0 right-0 h-0.5 bg-primary-gold opacity-30"></div>
+        <h2 className="relative inline-block bg-sand-lighter px-5 py-1 text-2xl md:text-3xl font-semibold text-primary-brown font-['Amiri']">
           Today's Iftar Meals
         </h2>
       </div>
 
       <Suspense fallback={
-        <div className="flex justify-center items-center py-8">
+        <div className="flex justify-center items-center py-16">
           <div className="ramadan-spinner"></div>
-          <span className="ml-3 text-primary-brown">Loading delicious meals...</span>
+          <span className="ml-3 text-lg text-primary-brown font-['Amiri']">Loading delicious meals...</span>
         </div>
       }>
         <PostList />
