@@ -1,16 +1,24 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Share2, Check, Copy, Facebook, Twitter, WhatsApp, Mail } from 'lucide-react';
 
 interface ShareAppButtonProps {
   className?: string;
   showText?: boolean;
+  position?: 'header' | 'floating';
 }
 
-export default function ShareAppButton({ className = '', showText = true }: ShareAppButtonProps) {
+export default function ShareAppButton({ 
+  className = '', 
+  showText = true,
+  position = 'header'
+}: ShareAppButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [menuPosition, setMenuPosition] = useState({ top: true, right: true });
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   
   const appTitle = "Ramadan Iftar Contest";
   const appDescription = "Join our Ramadan community by sharing your Iftar meals and discovering dishes from others!";
@@ -21,6 +29,45 @@ export default function ShareAppButton({ className = '', showText = true }: Shar
     text: appDescription,
     url: appUrl
   };
+
+  // Calculate menu position based on button position
+  useEffect(() => {
+    if (isOpen && buttonRef.current && menuRef.current) {
+      // Get button position
+      const buttonRect = buttonRef.current.getBoundingClientRect();
+      const menuRect = menuRef.current.getBoundingClientRect();
+      
+      // Check if menu would go off-screen to the right
+      const rightOverflow = buttonRect.right + menuRect.width > window.innerWidth;
+      // Check if menu would go off-screen at the bottom
+      const bottomOverflow = buttonRect.bottom + menuRect.height > window.innerHeight;
+      
+      setMenuPosition({
+        right: !rightOverflow,
+        top: !bottomOverflow
+      });
+    }
+  }, [isOpen]);
+  
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        isOpen && 
+        buttonRef.current && 
+        !buttonRef.current.contains(event.target as Node) &&
+        menuRef.current && 
+        !menuRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
   
   const handleShare = async () => {
     if (navigator.share && navigator.canShare(shareData)) {
@@ -33,7 +80,7 @@ export default function ShareAppButton({ className = '', showText = true }: Shar
         }
       }
     } else {
-      setIsOpen(true);
+      setIsOpen(!isOpen);
     }
   };
 
@@ -79,24 +126,39 @@ export default function ShareAppButton({ className = '', showText = true }: Shar
   ];
 
   return (
-    <div className="relative">
+    <div className={`relative ${position === 'floating' ? 'h-12 w-12' : ''}`}>
       <button 
+        ref={buttonRef}
         onClick={handleShare}
-        className={`flex items-center justify-center bg-primary-gold hover:bg-secondary-gold text-white px-4 py-2 rounded-md transition-all ${className}`}
+        className={`flex items-center justify-center bg-primary-gold hover:bg-secondary-gold text-white transition-all ${
+          position === 'floating' 
+            ? 'h-12 w-12 rounded-full shadow-lg' 
+            : 'px-4 py-2 rounded-md'
+        } ${className}`}
         aria-label="Share app"
       >
-        <Share2 size={18} className="mr-2" />
+        <Share2 size={18} className={showText ? "mr-2" : ""} />
         {showText && <span>Share App</span>}
       </button>
       
       {isOpen && (
         <>
           <div 
-            className="fixed inset-0 bg-black bg-opacity-20 z-40"
+            className="fixed inset-0 bg-black bg-opacity-20 z-40 sm:hidden"
             onClick={closeMenu}
             aria-hidden="true"
           ></div>
-          <div className="absolute right-0 top-full mt-2 w-64 bg-cream rounded-md shadow-lg z-50 border border-primary-gold overflow-hidden">
+          <div 
+            ref={menuRef}
+            className={`absolute ${
+              menuPosition.top ? 'top-full' : 'bottom-full'
+            } ${
+              menuPosition.right ? 'right-0' : 'left-0'
+            } mt-2 mb-2 w-64 bg-cream rounded-md shadow-lg z-50 border border-primary-gold overflow-hidden`}
+            style={{
+              maxWidth: 'calc(100vw - 20px)'
+            }}
+          >
             <div className="p-3 border-b border-primary-gold border-opacity-30">
               <h3 className="text-primary-brown font-medium">Share Ramadan Iftar Contest</h3>
             </div>

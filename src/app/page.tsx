@@ -48,10 +48,6 @@ export default async function Home() {
     <main className="container mx-auto px-4 py-10 md:py-12">
       {/* Header section with Share button */}
       <div className="text-center mb-10 md:mb-12 relative">
-        {/* Share button positioned in the top right */}
-        <div className="absolute right-0 top-0 z-10">
-          <ShareAppButton />
-        </div>
         
         <div className="inline-flex items-center justify-center mb-4">
           <Moon className="h-9 w-9 md:h-10 md:w-10 text-primary-gold" />
