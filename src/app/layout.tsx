@@ -1,4 +1,3 @@
-// app/layout.tsx
 import type { Metadata } from 'next';
 import { Inter, Amiri } from 'next/font/google';
 import './globals.css';
@@ -20,19 +19,38 @@ export const metadata: Metadata = {
   description: 'Share your Iftar meals and vote for your favorites during Ramadan',
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} ${amiri.variable}`}>
+      <body className={`${inter.className} ${amiri.variable} flex flex-col min-h-screen`}>
         <AuthProvider>
           <Navbar />
-          <main className="min-h-screen">{children}</main>
+          <main className="flex-grow">{children}</main>
+          <Footer />
         </AuthProvider>
       </body>
     </html>
+  );
+}
+
+// Footer Component
+function Footer() {
+  return (
+    <footer className="bg-primary-brown text-primary text-center py-4 text-sm">
+      <p>
+        Built by 
+        <a 
+          href="https://abuzaid.tech" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="underline hover:text-primary-gold ml-1"
+        >
+          Abuzaid
+        </a>
+      </p>
+      <p className="opacity-80 mt-1">
+        Developed during Ramadan 😅
+      </p>
+    </footer>
   );
 }
