@@ -6,6 +6,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import prisma from '@/lib/prisma';
 import PostList from '@/components/PostList';
+import DailyHadith from '@/components/DailyHadith';
 import { Moon, Camera, Star, Trophy } from 'lucide-react';
 
 export default async function Home() {
@@ -57,6 +58,11 @@ export default async function Home() {
           Join our Ramadan community by sharing your beautiful Iftar meals and discovering dishes from others.
           Vote for your favorites and celebrate the blessed month together with delicious food!
         </p>
+      </div>
+      
+      {/* Daily Hadith */}
+      <div className="mb-10">
+        <DailyHadith />
       </div>
 
       {/* Action buttons */}
