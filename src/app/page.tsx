@@ -7,6 +7,7 @@ import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import prisma from '@/lib/prisma';
 import PostList from '@/components/PostList';
 import DailyHadith from '@/components/DailyHadith';
+import ShareAppButton from '@/components/ShareAppButton';
 import { Moon, Camera, Star, Trophy } from 'lucide-react';
 
 export default async function Home() {
@@ -45,8 +46,13 @@ export default async function Home() {
 
   return (
     <main className="container mx-auto px-4 py-10 md:py-12">
-      {/* Header section */}
-      <div className="text-center mb-10 md:mb-12">
+      {/* Header section with Share button */}
+      <div className="text-center mb-10 md:mb-12 relative">
+        {/* Share button positioned in the top right */}
+        <div className="absolute right-0 top-0 z-10">
+          <ShareAppButton />
+        </div>
+        
         <div className="inline-flex items-center justify-center mb-4">
           <Moon className="h-9 w-9 md:h-10 md:w-10 text-primary-gold" />
           <h1 className="text-4xl md:text-5xl font-bold text-primary-brown mx-4 font-['Amiri'] tracking-wide">
@@ -116,6 +122,11 @@ export default async function Home() {
       }>
         <PostList />
       </Suspense>
+      
+      {/* Fixed Share button for mobile */}
+      <div className="md:hidden fixed bottom-6 right-6 z-30">
+        <ShareAppButton className="rounded-full w-12 h-12 shadow-lg" showText={false} />
+      </div>
     </main>
   );
 }
