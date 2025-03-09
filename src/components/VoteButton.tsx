@@ -45,7 +45,7 @@ export default function VoteButton({
       disabled={isLoading}
       className={`flex items-center gap-1 px-4 py-2 rounded-full transition-all ${
         voted
-          ? 'bg-primary-gold bg-opacity-20 text-primary-gold'
+          ? 'bg-opacity-20 text-primary-gold'
           : 'bg-sand-light text-primary-brown hover:bg-primary-gold hover:bg-opacity-20 hover:text-primary-gold'
       } disabled:opacity-50 border ${voted ? 'border-primary-gold' : 'border-transparent hover:border-primary-gold'}`}
     >
