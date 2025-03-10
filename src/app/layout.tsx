@@ -3,6 +3,8 @@ import { Inter, Amiri } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import AuthProvider from '@/components/AuthProvider';
+import '@/lib/pwa';
+import PWAInstallGuide from '@/components/PWAInstallGuide';
 
 const inter = Inter({ subsets: ['latin'] });
 const amiri = Amiri({ 
@@ -17,6 +19,8 @@ const amiri = Amiri({
 export const metadata: Metadata = {
   title: 'Ramadan Iftar Contest',
   description: 'Share your Iftar meals and vote for your favorites during Ramadan',
+  manifest: '/manifest.json',
+  themeColor: '#C8A655',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -27,6 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Navbar />
           <main className="flex-grow">{children}</main>
           <Footer />
+          <PWAInstallGuide />
         </AuthProvider>
       </body>
     </html>
