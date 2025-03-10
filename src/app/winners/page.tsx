@@ -135,14 +135,6 @@ export default async function WinnersPage() {
     <div className="container mx-auto px-4 py-12">
       <div className="ramadan-decoration-top mb-6"></div>
       
-      <div className="flex items-center justify-center mb-6">
-        <Moon className="h-8 w-8 text-primary-gold mr-3" />
-        <h1 className="text-3xl md:text-4xl font-bold text-center font-['Amiri'] text-primary-brown">
-          رمضان كريم - Ramadan Iftar Champions
-        </h1>
-        <Star className="h-8 w-8 text-primary-gold ml-3" />
-      </div>
-      
       <p className="text-center text-primary-brown opacity-80 max-w-2xl mx-auto mb-10 font-['Amiri'] text-xl">
         {winners.length > 0 
           ? "Celebrating the most delicious and beautifully presented Iftar meals from our community."
