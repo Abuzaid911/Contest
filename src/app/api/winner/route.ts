@@ -22,7 +22,37 @@ export async function GET(req: NextRequest) {
     const nextDay = new Date(date);
     nextDay.setDate(nextDay.getDate() + 1);
     
-    // Find the post with the most votes for the given date
+    // First, check if a winner is already marked for this date
+    const existingWinner = await prisma.post.findFirst({
+      where: {
+        date: {
+          gte: date,
+          lt: nextDay,
+        },
+        isWinner: true
+      },
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          },
+        },
+        _count: {
+          select: {
+            votes: true,
+          },
+        },
+      }
+    });
+    
+    // If a winner exists, return it
+    if (existingWinner) {
+      return NextResponse.json(existingWinner);
+    }
+    
+    // If no winner is marked, find the post with the most votes for the given date
     const posts = await prisma.post.findMany({
       where: {
         date: {
@@ -58,8 +88,8 @@ export async function GET(req: NextRequest) {
     
     const winner = posts[0];
     
-    // Update the post to mark it as a winner if not already marked
-    if (!winner.isWinner) {
+    // Update the post to mark it as a winner if it has at least one vote
+    if (winner._count.votes > 0) {
       await prisma.post.update({
         where: {
           id: winner.id,
@@ -71,7 +101,8 @@ export async function GET(req: NextRequest) {
     }
     
     return NextResponse.json(winner);
-  } catch (_error) {
+  } catch (error) {
+    console.error("Error fetching winner:", error);
     return NextResponse.json({ error: "Failed to fetch winner" }, { status: 500 });
   }
 }
@@ -94,6 +125,25 @@ export async function POST(req: NextRequest) {
     date.setHours(0, 0, 0, 0);
     const nextDay = new Date(date);
     nextDay.setDate(nextDay.getDate() + 1);
+    
+    // Check if a winner is already marked for this date
+    const existingWinner = await prisma.post.findFirst({
+      where: {
+        date: {
+          gte: date,
+          lt: nextDay,
+        },
+        isWinner: true
+      }
+    });
+    
+    // If a winner already exists, return it
+    if (existingWinner) {
+      return NextResponse.json({ 
+        message: "A winner has already been determined for this date",
+        winner: existingWinner
+      });
+    }
     
     // Find the post with the most votes for the given date
     const posts = await prisma.post.findMany({
@@ -124,18 +174,30 @@ export async function POST(req: NextRequest) {
     
     const winner = posts[0];
     
-    // Update the post to mark it as a winner
-    await prisma.post.update({
-      where: {
-        id: winner.id,
-      },
-      data: {
-        isWinner: true,
-      },
-    });
-    
-    return NextResponse.json(winner);
-  } catch (_error) {
+    // Only mark as winner if it has at least one vote
+    if (winner._count.votes > 0) {
+      // Update the post to mark it as a winner
+      await prisma.post.update({
+        where: {
+          id: winner.id,
+        },
+        data: {
+          isWinner: true,
+        },
+      });
+      
+      return NextResponse.json({
+        message: "Winner determined successfully",
+        winner: winner
+      });
+    } else {
+      return NextResponse.json({
+        message: "No posts with votes found for this date",
+        candidate: winner
+      });
+    }
+  } catch (error) {
+    console.error("Error determining winner:", error);
     return NextResponse.json({ error: "Failed to determine winner" }, { status: 500 });
   }
 }
