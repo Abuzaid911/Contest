@@ -1,5 +1,5 @@
-import { PrismaClient } from '@prisma/client';
-import { schedule } from 'node-cron';
+const { PrismaClient } = require('@prisma/client');
+const { schedule } = require('node-cron');
 
 const prisma = new PrismaClient();
 
@@ -56,10 +56,17 @@ async function determineWinner() {
     console.log(`Winner determined for ${today.toISOString().split('T')[0]}:`, winnerPost.id);
   } catch (error) {
     console.error('Error determining winner:', error);
+  } finally {
+    await prisma.$disconnect();
   }
 }
 
+// Run immediately to check for any pending winners
+determineWinner().catch(console.error);
+
 // Schedule the job to run at 10 PM GMT every day
-schedule('0 22 * * *', determineWinner);
+schedule('0 22 * * *', () => {
+  determineWinner().catch(console.error);
+});
 
 console.log('Winner determination scheduler started');
