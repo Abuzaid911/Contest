@@ -170,7 +170,7 @@ export default async function WinnersPage() {
               <div className="bg-primary-gold text-white font-bold py-2 px-6 rounded-full shadow-lg border-2 border-white inline-flex items-center">
                 <Moon className="h-4 w-4 mr-1.5" />
                 <span className="font-['Amiri']">
-                  {winners.length > 0 ? `Day ${index + 1}` : ""} • {format(new Date(post.date), "MMMM d, yyyy")}
+                  {format(new Date(post.date), "MMMM d, yyyy")}
                 </span>
               </div>
             </div>
@@ -195,12 +195,6 @@ export default async function WinnersPage() {
                 </div>
                 
                 <div className="p-6 md:p-8 md:w-3/5">
-                  <div className="flex items-center mb-3">
-                    <Star className="h-5 w-5 text-primary-gold mr-2" />
-                    <h3 className="text-xl font-semibold text-primary-brown font-['Amiri']">
-                      {format(new Date(post.date), "dddd")}
-                    </h3>
-                  </div>
                   
                   <h3 className="text-2xl font-bold mb-4 text-primary-brown font-['Amiri']">{post.title}</h3>
                   
