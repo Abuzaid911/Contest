@@ -111,24 +111,26 @@ export default function PostCard({ post, hasVoted, onVote, onDelete }: PostCardP
 
   return (
     <div className="bg-cream rounded-lg shadow-md overflow-hidden border border-primary-gold post-card hover-lift" role="article">
-      <div className="relative h-64 w-full">
-        <div className={`transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}>
+      <div className="relative h-64 w-full bg-sand-light flex items-center justify-center">
+        {!imageLoaded && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="ramadan-spinner" />
+          </div>
+        )}
+        
+        <div className={`transition-opacity duration-300 w-full h-full flex items-center justify-center ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}>
           <Image
             src={post.imageUrl}
             alt={post.title}
             fill
-            className="object-cover"
+            className="object-contain" // Changed from object-cover to object-contain
             onLoadingComplete={() => setImageLoaded(true)}
             priority
           />
         </div>
-        {!imageLoaded && (
-          <div className="absolute inset-0 flex items-center justify-center bg-sand-light">
-            <div className="ramadan-spinner" />
-          </div>
-        )}
+        
         {post.isWinner && (
-          <div className="absolute top-2 right-2 bg-primary-gold text-white font-bold py-1 px-3 rounded-full flex items-center shadow-md border-2 border-white winner-banner">
+          <div className="absolute top-2 right-2 bg-primary-gold text-white font-bold py-1 px-3 rounded-full flex items-center shadow-md border-2 border-white z-10">
             <Award className="h-5 w-5 mr-1" />
             Winner!
           </div>
