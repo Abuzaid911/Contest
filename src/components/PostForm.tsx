@@ -194,7 +194,7 @@ export default function PostForm() {
           {isLoading ? (
             <>
               <div className="ramadan-spinner mr-2 border-2 h-5 w-5 border-white border-l-transparent"></div>
-              Sharing...
+              Sharing....
             </>
           ) : (
             <>
