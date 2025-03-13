@@ -29,7 +29,7 @@ export async function POST(
     }
     
     // Check if the post is already marked as winner
-    const isCurrentlyWinner = post.isWinner;
+    const isCurrentlyWinner = post.isWinner === true;
     
     if (isCurrentlyWinner) {
       // If it's already a winner, remove the winner status
@@ -38,7 +38,7 @@ export async function POST(
           id: postId,
         },
         data: {
-          isWinner: false,
+          isWinner: false, // Make sure we use a boolean value, not a string
         },
       });
       
@@ -63,7 +63,7 @@ export async function POST(
           isWinner: true,
         },
         data: {
-          isWinner: false,
+          isWinner: false, // Make sure we use a boolean value, not a string
         },
       });
       
@@ -73,7 +73,7 @@ export async function POST(
           id: postId,
         },
         data: {
-          isWinner: true,
+          isWinner: true, // Make sure we use a boolean value, not a string
         },
       });
       
