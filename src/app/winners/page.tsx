@@ -163,10 +163,10 @@ export default async function WinnersPage() {
           <div key={post.id} className="relative">
             {/* Date indicator with crescent moon design */}
             <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 z-10">
-              <div className="bg-primary-gold text-white font-bold py-2 px-6 rounded-full shadow-lg border-2 border-white inline-flex items-center">
+              <div className="bg-white text-primary-gold font-bold py-2 px-6 rounded-full shadow-lg border-2 border-white inline-flex items-center">
                 <Moon className="h-4 w-4 mr-1.5" />
                 <span className="font-['Amiri']">
-                  {format(new Date(post.date), "MMMM d, yyyy")}
+                  {format(new Date(post.date), "MMMM d")}
                 </span>
               </div>
             </div>
