@@ -64,8 +64,8 @@ async function determineWinner() {
 // Run immediately to check for any pending winners
 determineWinner().catch(console.error);
 
-// Schedule the job to run at 10 PM GMT every day
-schedule('0 01 * * *', () => {
+// Schedule the job to run at 1 AM GMT every day
+schedule('0 1 * * *', () => {
   determineWinner().catch(console.error);
 });
 
