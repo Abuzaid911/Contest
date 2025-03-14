@@ -14,9 +14,9 @@ export default function CountdownTimer() {
     const calculateTimeLeft = () => {
       const now = new Date();
       const targetTime = new Date(now);
-      targetTime.setUTCHours(22, 0, 0, 0); // 10 PM GMT
+      targetTime.setUTCHours(1, 0, 0, 0); // 1 AM GMT
 
-      // If it's past 10 PM GMT, set target to next day
+      // If it's past 1 AM GMT, set target to next day
       if (now > targetTime) {
         targetTime.setDate(targetTime.getDate() + 1);
       }
