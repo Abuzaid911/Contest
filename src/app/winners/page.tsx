@@ -13,10 +13,14 @@ export default async function WinnersPage() {
   const sevenDaysAgo = new Date(today);
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
   
-  // First try to get posts marked as winners
+  // First try to get posts marked as winners for the last 7 days
   const winners = await prisma.post.findMany({
     where: {
       isWinner: true,
+      date: {
+        gte: sevenDaysAgo,
+        lte: today,
+      },
     },
     include: {
       author: {

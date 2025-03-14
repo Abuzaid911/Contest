@@ -33,7 +33,7 @@ export default function AdminWinnersClient({ postsByDate }: PostsByDateProps) {
   const [winners, setWinners] = useState<Record<string, string>>({});
 
   // Initialize winners on component mount
-  useState(() => {
+  useEffect(() => {
     const initialWinners: Record<string, string> = {};
     
     // Find all current winners and store them
@@ -45,7 +45,7 @@ export default function AdminWinnersClient({ postsByDate }: PostsByDateProps) {
     });
     
     setWinners(initialWinners);
-  });
+  }, [postsByDate]);
 
   const handleMarkWinner = async (postId: string, dateString: string) => {
     // Set loading state for this specific button
