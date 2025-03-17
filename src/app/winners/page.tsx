@@ -6,14 +6,14 @@ import { Trophy, Star, ArrowLeft, Heart, Calendar, Moon } from 'lucide-react';
 import prisma from '@/lib/prisma';
 
 export default async function WinnersPage() {
-  // Fetch all posts with votes for the last 7 days (even if they're not marked as winners)
+  // Fetch all posts with votes for the last 21 days (even if they're not marked as winners)
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
   const sevenDaysAgo = new Date(today);
-  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 21);
   
-  // First try to get posts marked as winners for the last 7 days
+  // First try to get posts marked as winners for the last 21 days
   const winners = await prisma.post.findMany({
     where: {
       isWinner: true,
@@ -45,7 +45,7 @@ export default async function WinnersPage() {
   let topPostsByDay: any[] = [];
   
   if (winners.length === 0) {
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 21; i++) {
       const currentDate = new Date(today);
       currentDate.setDate(currentDate.getDate() - i);
       
