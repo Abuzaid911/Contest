@@ -22,7 +22,7 @@ export default async function ManageWinnersPage() {
   
   // Get all dates from the past 7 days
   const dates = [];
-  for (let i = 7; i >= 0; i--) {
+  for (let i = 21; i >= 0; i--) {
     const date = new Date(today);
     date.setDate(date.getDate() - i);
     dates.push(date);
